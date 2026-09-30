@@ -84,12 +84,20 @@ app.use(errorMiddleware);
 
 // Serve static client assets in production
 if (process.env.NODE_ENV === 'production') {
+  const fs = require('fs');
   const clientBuildPath = path.join(__dirname, '../client/dist');
-  app.use(express.static(clientBuildPath));
-  app.get('*', (req, res, next) => {
-    if (req.path.startsWith('/api')) return next();
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
+  if (fs.existsSync(clientBuildPath)) {
+    app.use(express.static(clientBuildPath));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) return next();
+      const indexPath = path.join(clientBuildPath, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+      } else {
+        res.status(200).json({ success: true, message: 'GG Academy API Server Operational 🚀' });
+      }
+    });
+  }
 }
 
 module.exports = app;
