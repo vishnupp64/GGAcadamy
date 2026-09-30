@@ -1,0 +1,28 @@
+services:
+  # Full-Stack Web Service (Express Server + React Client)
+  - type: web
+    name: gg-academy-platform
+    env: node
+    plan: free
+    buildCommand: npm run render:build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ggacademy-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: CLIENT_URL
+        sync: false
+
+# Managed PostgreSQL Database
+databases:
+  - name: ggacademy-db
+    databaseName: ggacademy
+    user: postgres
+    plan: free

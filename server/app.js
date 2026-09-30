@@ -82,4 +82,14 @@ app.use('/api/admin', adminRoutes);
 // Centralized Error Middleware
 app.use(errorMiddleware);
 
+// Serve static client assets in production
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../client/dist');
+  app.use(express.static(clientBuildPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
+
 module.exports = app;

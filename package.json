@@ -13,7 +13,9 @@
     "prisma:generate": "npx prisma generate",
     "prisma:push": "npx prisma db push",
     "prisma:seed": "node prisma/seed.js",
-    "build": "cd client && npm run build"
+    "build": "cd client && npm run build",
+    "render:build": "npm run setup && npx prisma generate && npx prisma db push && npm run prisma:seed && cd client && npm run build",
+    "start": "cd server && node server.js"
   },
   "keywords": [
     "react",
