@@ -15,7 +15,7 @@
     "prisma:seed": "node prisma/seed.js",
     "build": "cd client && npm install && npm run build",
     "render:build": "cd client && npm install && npm run build && npx prisma generate && npx prisma db push && npm run prisma:seed",
-    "postinstall": "npx prisma generate && (npx prisma db push || true) && cd client && npm install && npm run build",
+    "postinstall": "npx prisma generate && (npx prisma db push || true) && (npm run prisma:seed || true) && cd client && npm install && npm run build",
     "start": "node server/server.js"
   },
   "keywords": [
