@@ -165,9 +165,9 @@ export const GoogleAuthButton = ({ onSuccessCallback, text = 'Sign in with Googl
           align-items: center;
           justify-content: center;
           gap: 0.6rem;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          color: #ffffff;
+          background: var(--bg-tertiary);
+          border: 1px solid var(--border-color);
+          color: var(--text-primary);
           padding: 0.7rem 1rem;
           border-radius: 30px;
           font-size: 0.88rem;
@@ -177,8 +177,9 @@ export const GoogleAuthButton = ({ onSuccessCallback, text = 'Sign in with Googl
         }
 
         .btn-demo-google:hover {
-          background: rgba(255, 255, 255, 0.12);
+          background: var(--bg-card-hover);
           border-color: var(--accent-cyan);
+          color: var(--accent-cyan);
           transform: translateY(-1px);
         }
 

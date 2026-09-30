@@ -188,7 +188,9 @@ export const Header = () => {
 
       <style>{`
         .header {
-          background-color: rgba(10, 12, 16, 0.95);
+          background-color: var(--glass-bg);
+          backdrop-filter: var(--glass-blur);
+          -webkit-backdrop-filter: var(--glass-blur);
           border-bottom: 1px solid var(--border-color);
           position: relative;
           z-index: 100;
@@ -198,9 +200,9 @@ export const Header = () => {
         .header-sticky {
           position: sticky;
           top: 0;
-          backdrop-filter: blur(15px);
-          -webkit-backdrop-filter: blur(15px);
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+          backdrop-filter: var(--glass-blur);
+          -webkit-backdrop-filter: var(--glass-blur);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
         .header-container {
@@ -218,6 +220,11 @@ export const Header = () => {
           font-size: 1.5rem;
           font-weight: 800;
           letter-spacing: 1px;
+          color: var(--text-primary);
+        }
+
+        .logo-text {
+          color: var(--text-primary);
         }
 
         .logo-badge {
@@ -232,7 +239,7 @@ export const Header = () => {
         }
 
         .logo-accent {
-          color: var(--accent-primary);
+          color: var(--accent-cyan);
         }
 
         .desktop-nav {

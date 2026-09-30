@@ -226,14 +226,14 @@ export const RegisterPage = () => {
 
         .input-group label {
           font-size: 0.85rem;
-          color: var(--text-secondary);
+          color: var(--text-primary);
           font-weight: 600;
         }
 
         .input-field {
-          background: #181c28;
+          background: var(--bg-input);
           border: 1px solid var(--border-color);
-          color: #fff;
+          color: var(--text-primary);
           padding: 0.75rem 1rem;
           border-radius: 8px;
           font-size: 0.95rem;
