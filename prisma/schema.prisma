@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id               String           @id @default(uuid())
+  firstName        String
+  lastName         String
+  email            String           @unique
+  phone            String?
+  password         String?
+  googleId         String?          @unique
+  avatar           String?
+  role             Role             @default(USER)
+  carts            Cart[]
+  orders           Order[]
+  enrollments      Enrollment[]
+  lessonProgresses LessonProgress[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Product {
+  id               String         @id @default(uuid())
+  name             String
+  slug             String         @unique
+  description      String         @db.Text
+  shortDescription String?        @db.Text
+  price            Float
+  discountPrice    Float?
+  rating           Float          @default(5.0)
+  isPublished      Boolean        @default(true)
+  features         String?        @db.Text
+  compatibility    String?
+  categoryId       String
+  category         Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  images           ProductImage[]
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  url       String
+  isPrimary Boolean @default(false)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id                String      @id @default(uuid())
+  orderNumber       String      @unique
+  userId            String?
+  user              User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  amount            Float
+  subtotal          Float
+  discount          Float       @default(0)
+  paymentStatus     String      @default("PENDING")
+  orderStatus       String      @default("PROCESSING")
+  paymentMethod     String      @default("CARD")
+  transactionId     String?
+  razorpayOrderId   String?
+  razorpayPaymentId String?
+  customerInfo      String      @db.Text
+  items             OrderItem[]
+  enrollments       Enrollment[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price     Float
+  quantity  Int     @default(1)
+}
+
+model Course {
+  id               String         @id @default(uuid())
+  title            String
+  slug             String         @unique
+  description      String         @db.Text
+  shortDescription String?        @db.Text
+  price            Float
+  discountPrice    Float?
+  thumbnail        String?
+  isPublished      Boolean        @default(true)
+  modules          CourseModule[]
+  enrollments      Enrollment[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model CourseModule {
+  id        String   @id @default(uuid())
+  title     String
+  order     Int      @default(0)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lesson {
+  id            String           @id @default(uuid())
+  title         String
+  videoUrl      String?
+  duration      String?
+  order         Int              @default(0)
+  moduleId      String
+  module        CourseModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  isFreePreview Boolean          @default(false)
+  progresses    LessonProgress[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  orderId   String?
+  order     Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+}
+
+model LessonProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  isCompleted Boolean  @default(true)
+  completedAt DateTime @default(now())
+
+  @@unique([userId, lessonId])
+}
+
+model Testimonial {
+  id          String   @id @default(uuid())
+  name        String
+  location    String?
+  rating      Int      @default(5)
+  comment     String   @db.Text
+  avatar      String?
+  isPublished Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model FAQ {
+  id          String   @id @default(uuid())
+  question    String
+  answer      String   @db.Text
+  order       Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  subject   String
+  message   String   @db.Text
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+}
+
+model Announcement {
+  id        String   @id @default(uuid())
+  text      String
+  link      String?
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}

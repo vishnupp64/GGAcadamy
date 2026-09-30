@@ -1,0 +1,36 @@
+{
+  "name": "gg-academy-platform",
+  "version": "1.0.0",
+  "description": "Full-stack gaming e-learning and store platform replicating GG Academy",
+  "main": "server/server.js",
+  "scripts": {
+    "setup": "npm run setup:server && npm run setup:client",
+    "setup:server": "cd server && npm install",
+    "setup:client": "cd client && npm install",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "prisma:generate": "npx prisma generate",
+    "prisma:push": "npx prisma db push",
+    "prisma:seed": "node prisma/seed.js",
+    "build": "cd client && npm run build"
+  },
+  "keywords": [
+    "react",
+    "express",
+    "prisma",
+    "postgresql",
+    "ggacademy",
+    "gaming"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3"
+  }
+}
