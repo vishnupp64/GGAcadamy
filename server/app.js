@@ -27,7 +27,20 @@ const app = express();
 // Security Header settings
 app.use(
   helmet({
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://accounts.google.com", "https://apis.google.com", "https://*.google.com"],
+        scriptSrcElem: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://apis.google.com", "https://*.google.com"],
+        frameSrc: ["'self'", "https://accounts.google.com"],
+        connectSrc: ["'self'", "https://accounts.google.com", "https://www.googleapis.com", "https://oauth2.googleapis.com", "https://*.google.com"],
+        imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://accounts.google.com", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      },
+    },
   })
 );
 
