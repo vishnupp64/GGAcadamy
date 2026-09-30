@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const errorMiddleware = require('./src/middleware/errorMiddleware');
@@ -35,10 +36,10 @@ const allowedOrigins = [process.env.CLIENT_URL || 'http://localhost:5173', 'http
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'production') {
         callback(null, true);
       } else {
-        callback(null, true); // Allow during dev
+        callback(null, true);
       }
     },
     credentials: true,
@@ -47,8 +48,8 @@ app.use(
 
 // Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 300, // Limit each IP to 300 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 300,
   message: { success: false, message: 'Too many requests from this IP, please try again later.' },
 });
 app.use('/api', limiter);
@@ -65,7 +66,7 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ success: true, message: 'GG Academy API Server operational 🚀' });
 });
 
-// Mount Routes
+// Mount API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -79,25 +80,29 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Centralized Error Middleware
-app.use(errorMiddleware);
+// Serve static client assets
+const clientBuildPath = path.join(__dirname, '../client/dist');
+const indexPath = path.join(clientBuildPath, 'index.html');
 
-// Serve static client assets in production
-if (process.env.NODE_ENV === 'production') {
-  const fs = require('fs');
-  const clientBuildPath = path.join(__dirname, '../client/dist');
-  if (fs.existsSync(clientBuildPath)) {
-    app.use(express.static(clientBuildPath));
-    app.get('*', (req, res, next) => {
-      if (req.path.startsWith('/api')) return next();
-      const indexPath = path.join(clientBuildPath, 'index.html');
-      if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-      } else {
-        res.status(200).json({ success: true, message: 'GG Academy API Server Operational 🚀' });
-      }
-    });
-  }
+if (fs.existsSync(clientBuildPath)) {
+  app.use(express.static(clientBuildPath));
 }
+
+// Wildcard handler for Client SPA & Root
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ success: false, message: 'API endpoint not found.' });
+  }
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  return res.status(200).json({
+    success: true,
+    message: 'GG Academy Platform API Server Operational 🚀 (Frontend build not found)',
+  });
+});
+
+// Centralized Error Middleware (MUST BE LAST)
+app.use(errorMiddleware);
 
 module.exports = app;
